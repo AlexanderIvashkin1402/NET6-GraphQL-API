@@ -9,54 +9,41 @@ public class PlatformQuery : ObjectGraphType
 {
     private readonly IRepository _repository;
 
-    [Obsolete]
     public PlatformQuery(IRepository repository)
     {
         _repository = repository;
 
-        Field<ListGraphType<PlatformType>>("platforms",
-            arguments: new QueryArguments(new List<QueryArgument>
-            {
-                new QueryArgument<IdGraphType>
+        Field<ListGraphType<PlatformType>>("platforms")
+            .Argument<IdGraphType>("id")
+            .Argument<StringGraphType>("name")
+            .Argument<StringGraphType>("licenseKey")
+            .Resolve(context =>
                 {
-                    Name = "id"
-                },
-                new QueryArgument<StringGraphType>
-                {
-                    Name = "name"
-                },
-                new QueryArgument<StringGraphType>
-                {
-                    Name = "licenseKey"
-                }
-            }),
-            resolve: context =>
-            {
-                var query = _repository.GetPlatforms().ToList();
+                    var query = _repository.GetPlatforms().ToList();
 
-                var platfromId = context.GetArgument<int?>("id");
-                if (platfromId.HasValue)
-                {
-                    var result = query.Where(p => p.Id == platfromId.Value);
-                    return result;
-                }
+                    var platfromId = context.GetArgument<int?>("id");
+                    if (platfromId.HasValue)
+                    {
+                        var result = query.Where(p => p.Id == platfromId.Value);
+                        return result;
+                    }
 
-                var name = context.GetArgument<string?>("name");
-                if (!string.IsNullOrEmpty(name))
-                {
-                    return query
-                        .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Equals(name));
-                }
+                    var name = context.GetArgument<string?>("name");
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        return query
+                            .Where(p => !string.IsNullOrEmpty(p.Name) && p.Name.Equals(name));
+                    }
 
-                var licenseKey = context.GetArgument<string?>("licenseKey");
-                if (!string.IsNullOrEmpty(licenseKey))
-                {
-                    return query
-                        .Where(p => !string.IsNullOrEmpty(p.LicenseKey) && p.LicenseKey.Equals(licenseKey));
-                }
+                    var licenseKey = context.GetArgument<string?>("licenseKey");
+                    if (!string.IsNullOrEmpty(licenseKey))
+                    {
+                        return query
+                            .Where(p => !string.IsNullOrEmpty(p.LicenseKey) && p.LicenseKey.Equals(licenseKey));
+                    }
 
-                return query;
-            }
-        );
-    }
+                    return query;
+                });
+
+     }
 }
