@@ -1,23 +1,23 @@
 ﻿using CommanderGQL.Data;
 using CommanderGQL.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommanderGQL.Repository
 {
     public class SqlDbRepository : IRepository
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IDbContextFactory<AppDbContext> _contextFactory;
 
-        public SqlDbRepository(IServiceProvider serviceProvider)
+        public SqlDbRepository(IDbContextFactory<AppDbContext> contextFactory)
         {
-            _serviceProvider = serviceProvider;
+            _contextFactory = contextFactory;
         }
 
         public IEnumerable<Platform> GetPlatforms()
         {
-            using (var scope = _serviceProvider.CreateScope())
+            using (var context = _contextFactory.CreateDbContext())
             {
-                var appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                return appDbContext.Platforms.ToList();
+                return context.Platforms.ToList();
             }
         }
     }
