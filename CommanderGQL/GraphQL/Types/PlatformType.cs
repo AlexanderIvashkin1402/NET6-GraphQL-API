@@ -7,6 +7,8 @@ public class PlatformType : ObjectGraphType<Platform>
 {
     public PlatformType()
     {
+        Description = "Software Platform";
+
         Field(x => x.Id);
         Field(x => x.Name);
         Field(x => x.LicenseKey);

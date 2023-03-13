@@ -13,6 +13,8 @@ public class PlatformQuery : ObjectGraphType
     {
         _repository = repository;
 
+        Description = "Query to get Platforms";
+
         Field<ListGraphType<PlatformType>>("platforms")
             .Argument<IdGraphType>("id")
             .Argument<StringGraphType>("name")
@@ -44,6 +46,5 @@ public class PlatformQuery : ObjectGraphType
 
                     return query;
                 });
-
      }
 }
