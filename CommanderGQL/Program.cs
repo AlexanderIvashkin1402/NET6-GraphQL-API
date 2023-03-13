@@ -2,7 +2,7 @@ using CommanderGQL.Data;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
 using CommanderGQL.GraphQL.Queries;
-using CommanderGQL.GraphQL.Shcemas;
+using CommanderGQL.GraphQL.Schemas;
 using CommanderGQL.Repository;
 
 var builder = WebApplication.CreateBuilder(args);

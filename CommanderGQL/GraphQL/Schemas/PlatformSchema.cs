@@ -1,7 +1,7 @@
 ﻿using CommanderGQL.GraphQL.Queries;
 using GraphQL.Types;
 
-namespace CommanderGQL.GraphQL.Shcemas;
+namespace CommanderGQL.GraphQL.Schemas;
 
 public class PlatformSchema : Schema
 {
