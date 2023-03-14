@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace NET7_GraphQL_API.Migrations
+namespace CommanderGQL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20230311151615_Initial")]
+    [Migration("20230314075949_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -59,7 +59,6 @@ namespace NET7_GraphQL_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("LicenseKey")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")

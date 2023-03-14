@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace NET7_GraphQL_API.Migrations
+namespace CommanderGQL.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -17,7 +17,7 @@ namespace NET7_GraphQL_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LicenseKey = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    LicenseKey = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

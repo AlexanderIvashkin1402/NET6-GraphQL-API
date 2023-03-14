@@ -1,6 +1,5 @@
 using CommanderGQL.Data;
 using GraphQL;
-using GraphQL.Server.Ui.Voyager;
 using Microsoft.EntityFrameworkCore;
 using CommanderGQL.GraphQL.Queries;
 using CommanderGQL.GraphQL.Schemas;
