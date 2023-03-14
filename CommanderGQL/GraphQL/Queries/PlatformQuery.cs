@@ -9,7 +9,7 @@ public class PlatformQuery : ObjectGraphType
 {
     public PlatformQuery(IRepository repository)
     {
-        Description = "Query to get Platforms";
+        Description = "Query to get Platforms and Commands";
 
         Field<ListGraphType<PlatformType>>("platforms")
             .Argument<IdGraphType>("id")
@@ -41,6 +41,32 @@ public class PlatformQuery : ObjectGraphType
                     }
 
                     return query;
-                });
-     }
+                })
+            .Description("Query to get Platforms");
+
+        Field<ListGraphType<CommandType>>("commands")
+            .Argument<IdGraphType>("id")
+            .Argument<StringGraphType>("howTo")
+            .Resolve(context =>
+            {
+                var query = repository.GetCommands().ToList();
+
+                var commandId = context.GetArgument<int?>("id");
+                if (commandId.HasValue)
+                {
+                    var result = query.Where(c => c.Id == commandId.Value);
+                    return result;
+                }
+
+                var howTo = context.GetArgument<string?>("howTo");
+                if (!string.IsNullOrEmpty(howTo))
+                {
+                    return query
+                        .Where(c => !string.IsNullOrEmpty(c.HowTo) && c.HowTo.Equals(howTo, StringComparison.OrdinalIgnoreCase));
+                }
+
+                return query;
+            })
+            .Description("Query to get Commands");
+    }
 }

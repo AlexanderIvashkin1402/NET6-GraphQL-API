@@ -24,6 +24,11 @@ public class SqlDbRepository : IRepository
         using var context = _contextFactory.CreateDbContext();
         return context.Platforms.Include(x => x.Commands).ToList();
     }
+    public IEnumerable<Command> GetCommands()
+    {
+        using var context = _contextFactory.CreateDbContext();
+        return context.Commands.Include(x => x.Platform).ToList();
+    }
 
     public Platform GetPlatform(int platformId)
     {
