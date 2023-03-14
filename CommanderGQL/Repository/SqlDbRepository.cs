@@ -28,6 +28,13 @@ public class SqlDbRepository : IRepository
     public Platform GetPlatform(int platformId)
     {
         using var context = _contextFactory.CreateDbContext();
-        return context.Platforms.Include(x => x.Commands).FirstOrDefault(x => x.Id == platformId);
+        return context.Platforms.Include(x => x.Commands).SingleOrDefault(x => x.Id == platformId);
+    }
+
+    public async Task<ILookup<int, Command>> GetCommandsByPlatformAsync(IEnumerable<int> platformIds)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        var commands = await context.Commands.Where(x => platformIds.Contains(x.PlatformId)).ToListAsync();
+        return commands.ToLookup(c => c.PlatformId);
     }
 }

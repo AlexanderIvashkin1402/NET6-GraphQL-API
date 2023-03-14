@@ -9,27 +9,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddPooledDbContextFactory<AppDbContext>(opt => 
     opt.UseSqlServer(builder.Configuration.GetConnectionString("CommandConStr")));
 builder.Services.AddSingleton<IRepository, SqlDbRepository>();
 
 builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
-    .AddSchema<PlatformSchema>()
-    //.AddGraphTypes(typeof(PlatformSchema).Assembly)
-    //.AddSelfActivatingSchema<PlatformSchema>()
+    .AddSelfActivatingSchema<PlatformSchema>()
     .AddGraphTypes()
+    .AddDataLoader()
 );
-
 
 // must manually register the query and mutation types or AOT will trim their constructors
 // all other graph types' constructors are preserved via calls to Field<T>
 builder.Services.AddTransient<PlatformQuery>();
-
 
 var app = builder.Build();
 

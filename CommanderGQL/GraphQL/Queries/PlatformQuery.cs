@@ -7,12 +7,8 @@ namespace CommanderGQL.GraphQL.Queries;
 
 public class PlatformQuery : ObjectGraphType
 {
-    private readonly IRepository _repository;
-
     public PlatformQuery(IRepository repository)
     {
-        _repository = repository;
-
         Description = "Query to get Platforms";
 
         Field<ListGraphType<PlatformType>>("platforms")
@@ -21,7 +17,7 @@ public class PlatformQuery : ObjectGraphType
             .Argument<StringGraphType>("licenseKey")
             .Resolve(context =>
                 {
-                    var query = _repository.GetPlatforms().ToList();
+                    var query = repository.GetPlatforms().ToList();
 
                     var platfromId = context.GetArgument<int?>("id");
                     if (platfromId.HasValue)
