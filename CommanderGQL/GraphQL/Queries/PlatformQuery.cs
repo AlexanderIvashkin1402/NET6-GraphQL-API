@@ -18,6 +18,7 @@ public class PlatformQuery : ObjectGraphType
             .Argument<StringGraphType>("orderBy")
             .Argument<IdGraphType>("skip")
             .Argument<IdGraphType>("take")
+            .Argument<EnumerationGraphType<SortOrder>>("sortOrder")
             .Resolve(context =>
                 {
                     var query = repository.GetPlatforms().ToList();
@@ -43,11 +44,11 @@ public class PlatformQuery : ObjectGraphType
                             .Where(p => !string.IsNullOrEmpty(p.LicenseKey) && p.LicenseKey.Equals(licenseKey));
                     }
 
-                    var sortOrder = context.GetArgument<string?>("orderBy");
-                    if (!string.IsNullOrEmpty(sortOrder))
+                    var orderBy = context.GetArgument<string?>("orderBy");
+                    if (!string.IsNullOrEmpty(orderBy))
                     {
                         var order = SortOrder.ASC;
-                        var lexems = sortOrder.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        var lexems = orderBy.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                         if (lexems.Length == 2)
                         {
                             Enum.TryParse<SortOrder>(lexems[1].ToUpper(), out order);
@@ -59,6 +60,14 @@ public class PlatformQuery : ObjectGraphType
                                 ? query.OrderBy(p => p.Name).ToList()
                                 : query.OrderByDescending(p => p.Name).ToList();
                         }                        
+                    }
+
+                    var sortOrder = context.GetArgument<SortOrder?>("sortOrder");
+                    if (sortOrder.HasValue)
+                    {
+                        query = sortOrder.Value == SortOrder.ASC 
+                                ? query.OrderBy(p => p.Name).ToList()
+                                : query.OrderByDescending(p => p.Name).ToList();
                     }
 
                     var skip = context.GetArgument<int?>("skip");
@@ -114,6 +123,6 @@ public class PlatformQuery : ObjectGraphType
 
 public enum SortOrder
 {
-    ASC,
-    DESC
+    ASC = 0,
+    DESC = 1
 }
