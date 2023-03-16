@@ -15,6 +15,9 @@ public class PlatformQuery : ObjectGraphType
             .Argument<IdGraphType>("id")
             .Argument<StringGraphType>("name")
             .Argument<StringGraphType>("licenseKey")
+            .Argument<StringGraphType>("orderBy")
+            .Argument<IdGraphType>("skip")
+            .Argument<IdGraphType>("take")
             .Resolve(context =>
                 {
                     var query = repository.GetPlatforms().ToList();
@@ -40,12 +43,43 @@ public class PlatformQuery : ObjectGraphType
                             .Where(p => !string.IsNullOrEmpty(p.LicenseKey) && p.LicenseKey.Equals(licenseKey));
                     }
 
+                    var sortOrder = context.GetArgument<string?>("orderBy");
+                    if (!string.IsNullOrEmpty(sortOrder))
+                    {
+                        var order = SortOrder.ASC;
+                        var lexems = sortOrder.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                        if (lexems.Length == 2)
+                        {
+                            Enum.TryParse<SortOrder>(lexems[1].ToUpper(), out order);
+                        }
+
+                        if (lexems[0].Equals("name", StringComparison.OrdinalIgnoreCase))
+                        {
+                            query = order == SortOrder.ASC 
+                                ? query.OrderBy(p => p.Name).ToList()
+                                : query.OrderByDescending(p => p.Name).ToList();
+                        }                        
+                    }
+
+                    var skip = context.GetArgument<int?>("skip");
+                    if (skip.HasValue)
+                    {
+                        query = query.Skip(skip.Value).ToList();
+                    }
+
+                    var take = context.GetArgument<int?>("take");
+                    if (take.HasValue)
+                    {
+                        query = query.Take(take.Value).ToList();
+                    }
+
                     return query;
                 })
             .Description("Query to get Platforms");
 
         Field<ListGraphType<CommandType>>("commands")
             .Argument<IdGraphType>("id")
+            .Argument<IdGraphType>("platformId")
             .Argument<StringGraphType>("howTo")
             .Resolve(context =>
             {
@@ -55,6 +89,13 @@ public class PlatformQuery : ObjectGraphType
                 if (commandId.HasValue)
                 {
                     var result = query.Where(c => c.Id == commandId.Value);
+                    return result;
+                }
+                
+                var platformId = context.GetArgument<int?>("platformId");
+                if (platformId.HasValue)
+                {
+                    var result = query.Where(c => c.Platform?.Id == platformId.Value);
                     return result;
                 }
 
@@ -69,4 +110,10 @@ public class PlatformQuery : ObjectGraphType
             })
             .Description("Query to get Commands");
     }
+}
+
+public enum SortOrder
+{
+    ASC,
+    DESC
 }
