@@ -42,4 +42,20 @@ public class SqlDbRepository : IRepository
         var commands = await context.Commands.Where(x => platformIds.Contains(x.PlatformId)).ToListAsync();
         return commands.ToLookup(c => c.PlatformId);
     }
+
+    public async Task<Platform> AddPlatformAsync(Platform platform)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        context.Platforms.Add(platform);
+        await context.SaveChangesAsync();
+        return platform;
+    }
+
+    public async Task<Command> AddCommandAsync(Command command)
+    {
+        using var context = _contextFactory.CreateDbContext();
+        context.Commands.Add(command);
+        await context.SaveChangesAsync();
+        return command;
+    }
 }

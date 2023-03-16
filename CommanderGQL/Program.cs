@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using CommanderGQL.GraphQL.Queries;
 using CommanderGQL.GraphQL.Schemas;
 using CommanderGQL.Repository;
+using CommanderGQL.GraphQL.Types;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,7 @@ builder.Services.AddGraphQL(b => b
 // must manually register the query and mutation types or AOT will trim their constructors
 // all other graph types' constructors are preserved via calls to Field<T>
 builder.Services.AddTransient<PlatformQuery>();
+builder.Services.AddTransient<PlatformMutation>();
 
 var app = builder.Build();
 
