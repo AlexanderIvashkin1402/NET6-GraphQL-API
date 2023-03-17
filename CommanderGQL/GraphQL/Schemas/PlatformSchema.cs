@@ -10,5 +10,6 @@ public class PlatformSchema : Schema
     {
         Query = serviceProvider.GetRequiredService<PlatformQuery>();
         Mutation = serviceProvider.GetRequiredService<PlatformMutation>();
+        Subscription = serviceProvider.GetRequiredService<PlatformSubscription>();
     }
 }

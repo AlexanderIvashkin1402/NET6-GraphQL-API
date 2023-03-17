@@ -1,4 +1,5 @@
-﻿using CommanderGQL.Models;
+﻿using CommanderGQL.GraphQL.Messaging;
+using CommanderGQL.Models;
 using CommanderGQL.Repository;
 using GraphQL;
 using GraphQL.Types;
@@ -7,14 +8,16 @@ namespace CommanderGQL.GraphQL.Types;
 
 public class PlatformMutation : ObjectGraphType
 {
-    public PlatformMutation(IRepository repository)
+    public PlatformMutation(IRepository repository, PlatformMessageService messageService)
     {
         Field<PlatformType>("addPlatform")
             .Argument<NonNullGraphType<PlatformInputType>>("platform")
             .ResolveAsync(async context =>
                 {
                     var platform = context.GetArgument<Platform>("platform");
-                    return await repository.AddPlatformAsync(platform);
+                    await repository.AddPlatformAsync(platform);
+                    messageService.AddPlatformAddedMessage(platform);
+                    return platform;
                 });
 
         Field<CommandType>("addCommand")

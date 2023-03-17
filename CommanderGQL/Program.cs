@@ -1,10 +1,10 @@
 using CommanderGQL.Data;
 using GraphQL;
 using Microsoft.EntityFrameworkCore;
-using CommanderGQL.GraphQL.Queries;
 using CommanderGQL.GraphQL.Schemas;
 using CommanderGQL.Repository;
-using CommanderGQL.GraphQL.Types;
+using CommanderGQL.GraphQL.Messaging;
+using Microsoft.AspNetCore.WebSockets;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddPooledDbContextFactory<AppDbContext>(opt => 
     opt.UseSqlServer(builder.Configuration.GetConnectionString("CommandConStr")));
 builder.Services.AddSingleton<IRepository, SqlDbRepository>();
+builder.Services.AddSingleton<PlatformMessageService>();
+builder.Services.AddWebSockets(configure: options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromMinutes(5);
+});
 
 builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
@@ -21,22 +26,20 @@ builder.Services.AddGraphQL(b => b
     .AddDataLoader()
 );
 
-// must manually register the query and mutation types or AOT will trim their constructors
-// all other graph types' constructors are preserved via calls to Field<T>
-builder.Services.AddTransient<PlatformQuery>();
-builder.Services.AddTransient<PlatformMutation>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-
-app.UseGraphQL<PlatformSchema>();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseGraphQLPlayground();
 }
 
+app.UseWebSockets();
+app.UseGraphQL<PlatformSchema>("/graphql", options =>
+{
+    options.HandleWebSockets = true;
+});
 app.UseGraphQLVoyager("/graphql/graphql-voyager");
 
 app.Run();
